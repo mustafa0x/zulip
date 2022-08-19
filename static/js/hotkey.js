@@ -309,6 +309,10 @@ export function process_escape_key(e) {
                 return true;
             }
 
+            if ($(".compose_banner").length) {
+                $("#compose_banners").empty();
+            }
+
             // If the user hit the Esc key, cancel the current compose
             compose_actions.cancel();
             return true;
