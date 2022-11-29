@@ -3,7 +3,7 @@
    popovers system in popovers.js. */
 
 import $ from "jquery";
-import {delegate} from "tippy.js";
+import tippy, {delegate} from "tippy.js";
 
 import render_compose_control_buttons_popover from "../templates/compose_control_buttons_popover.hbs";
 import render_compose_select_enter_behaviour_popover from "../templates/compose_select_enter_behaviour_popover.hbs";
@@ -56,10 +56,34 @@ function on_show_prep(instance) {
     popovers.hide_all_except_sidebars(instance);
 }
 
+function tippy_no_propagation(target, popover_props) {
+    // Everything we do here can be implemented just using `delegate` like we do for
+    // `.compose_mobile_button` popover except `stopPropagation`.
+    // So, only use it when you want clicks on the target element to not propagate
+    // throughout the app.
+    $("body").on("click", target, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const instance = e.currentTarget._tippy;
+        if (instance) {
+            instance.hide();
+            // It is important to destroy popover for this
+            // toggle mechanism to work flawlessly and it has to be
+            // called inside instance.onHidden since tippy popovers
+            // are hidden on document clicks on their own which we don't
+            // control explicitly.
+            return;
+        }
+        tippy(e.currentTarget, {
+            ...default_popover_props,
+            showOnCreate: true,
+            ...popover_props,
+        });
+    });
+}
+
 export function initialize() {
-    delegate("body", {
-        ...default_popover_props,
-        target: "#streams_inline_icon",
+    tippy_no_propagation("#streams_inline_icon", {
         onShow(instance) {
             const can_create_streams =
                 settings_data.user_can_create_private_streams() ||
@@ -79,12 +103,15 @@ export function initialize() {
             left_sidebar_stream_setting_popover_displayed = true;
             return true;
         },
-        onHidden() {
+        onHidden(instance) {
+            instance.destroy();
             left_sidebar_stream_setting_popover_displayed = false;
         },
     });
 
     // compose box buttons popover shown on mobile widths.
+    // We want this click event to propagate and hide other popovers
+    // that could possibly obstruct user from using this popover.
     delegate("body", {
         ...default_popover_props,
         target: ".compose_mobile_button",
@@ -123,9 +150,7 @@ export function initialize() {
     // Cannot reproduce it on codepen -
     // https://codepen.io/amanagr/pen/jOLoKVg
     // So, probably a bug on our side.
-    delegate("body", {
-        ...default_popover_props,
-        target: ".compose_control_menu_wrapper",
+    tippy_no_propagation(".compose_control_menu_wrapper", {
         placement: "top",
         onShow(instance) {
             instance.setContent(
@@ -138,14 +163,13 @@ export function initialize() {
             compose_control_buttons_popover_instance = instance;
             popovers.hide_all_except_sidebars(instance);
         },
-        onHidden() {
+        onHidden(instance) {
+            instance.destroy();
             compose_control_buttons_popover_instance = undefined;
         },
     });
 
-    delegate("body", {
-        ...default_popover_props,
-        target: ".enter_sends",
+    tippy_no_propagation(".enter_sends", {
         placement: "top",
         onShow(instance) {
             on_show_prep(instance);
