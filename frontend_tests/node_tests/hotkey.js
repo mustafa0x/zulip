@@ -59,7 +59,6 @@ const overlays = mock_esm("../../static/js/overlays", {
     is_overlay_or_modal_open: () => overlays.is_modal_open() || overlays.is_active(),
 });
 const popovers = mock_esm("../../static/js/popovers", {
-    actions_popped: () => false,
     user_info_manage_menu_popped: () => false,
     message_info_popped: () => false,
     user_sidebar_popped: () => false,
