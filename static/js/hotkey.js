@@ -939,7 +939,7 @@ export function process_hotkey(e, hotkey) {
     // Shortcuts that operate on a message
     switch (event_name) {
         case "message_actions":
-            return popovers.open_message_menu(msg);
+            return popover_menus.toggle_message_actions_menu(msg);
         case "star_message":
             message_flags.toggle_starred_and_update_server(msg);
             return true;

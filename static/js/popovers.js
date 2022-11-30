@@ -551,28 +551,11 @@ export function popover_items_handle_keyboard(key, $items) {
     $items.eq(index).trigger("focus");
 }
 
-function focus_first_action_popover_item() {
+export function focus_first_action_popover_item() {
     // For now I recommend only calling this when the user opens the menu with a hotkey.
     // Our popup menus act kind of funny when you mix keyboard and mouse.
     const $items = get_action_menu_menu_items();
     focus_first_popover_item($items);
-}
-
-export function open_message_menu(message) {
-    if (message.locally_echoed) {
-        // Don't open the popup for locally echoed messages for now.
-        // It creates bugs with things like keyboard handlers when
-        // we get the server response.
-        return true;
-    }
-
-    const $popover_reference = $(".selected_message .actions_hover .zulip-icon-ellipsis-v-solid");
-    $popover_reference.trigger("click");
-    // Focus the popover only if it is displayed.
-    if ($popover_reference.length && $popover_reference[0]._tippy) {
-        setTimeout(focus_first_action_popover_item, 0);
-    }
-    return true;
 }
 
 export function actions_menu_handle_keyboard(key) {

@@ -108,6 +108,23 @@ function tippy_no_propagation(target, popover_props) {
     });
 }
 
+export function toggle_message_actions_menu(message) {
+    if (message.locally_echoed) {
+        // Don't open the popup for locally echoed messages for now.
+        // It creates bugs with things like keyboard handlers when
+        // we get the server response.
+        return true;
+    }
+
+    const $popover_reference = $(".selected_message .actions_hover .zulip-icon-ellipsis-v-solid");
+    $popover_reference.trigger("click");
+    // Focus the popover only if it is displayed.
+    if ($popover_reference.length && $popover_reference[0]._tippy) {
+        setTimeout(popovers.focus_first_action_popover_item, 0);
+    }
+    return true;
+}
+
 export function initialize() {
     tippy_no_propagation("#streams_inline_icon", {
         onShow(instance) {
