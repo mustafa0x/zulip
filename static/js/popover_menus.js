@@ -73,7 +73,12 @@ export function any_active() {
 }
 
 function on_show_prep(instance) {
-    $(instance.popper).one("click", instance.hide);
+    $(instance.popper).one("click", (e) => {
+        // Don't do preventDefault since it leads to
+        // direct links in popovers not working.
+        e.stopPropagation();
+        instance.hide();
+    });
     popovers.hide_all_except_sidebars(instance);
 }
 
