@@ -566,8 +566,12 @@ export function open_message_menu(message) {
         return true;
     }
 
-    $(".selected_message .actions_hover .zulip-icon-ellipsis-v-solid").trigger("click");
-    focus_first_action_popover_item();
+    const $popover_reference = $(".selected_message .actions_hover .zulip-icon-ellipsis-v-solid");
+    $popover_reference.trigger("click");
+    // Focus the popover only if it is displayed.
+    if ($popover_reference.length && $popover_reference[0]._tippy) {
+        setTimeout(focus_first_action_popover_item, 0);
+    }
     return true;
 }
 
